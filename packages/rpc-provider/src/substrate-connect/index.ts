@@ -94,7 +94,7 @@ export class ScProvider implements ProviderInterface {
 
   // Config details can be found in @substrate/connect repo following the link:
   // https://github.com/paritytech/substrate-connect/blob/main/packages/connect/src/connector/index.ts
-  async connect (config?: ScType.Config, checkerFactory = healthChecker): Promise<void> {
+  async connect (config?: ScType.Config, checkerFactory = healthChecker, state?: string): Promise<void> {
     if (this.isConnected) {
       throw new Error('Already connected!');
     }
@@ -126,6 +126,7 @@ export class ScProvider implements ProviderInterface {
     const hc = checkerFactory();
 
     const onResponse = (res: string): void => {
+      console.log(res) // TODO: remove, for debug only
       const hcRes = hc.responsePassThrough(res);
 
       if (!hcRes) {
@@ -158,7 +159,7 @@ export class ScProvider implements ProviderInterface {
       ? client.addWellKnownChain
       : client.addChain;
 
-    this.#chain = addChain(this.#spec as ScType.WellKnownChain, onResponse).then((chain) => {
+    this.#chain = addChain(this.#spec as ScType.WellKnownChain, onResponse, state).then((chain) => {
       hc.setSendJsonRpc(chain.sendJsonRpc);
 
       this.#isChainReady = false;
